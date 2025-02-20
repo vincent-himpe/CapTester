@@ -1,0 +1,690 @@
+var oemsecStockData;
+var oemsecSearchTerm;
+	jQuery(function(){
+		var secretsURL;
+		var mainScript = document.querySelector('script[data-oemsec_key]');
+		var parentScript = document.querySelector('script[data-oemsec_src]');
+		var loaderDomain = getParameterByName('environment') ? "https://" +getParameterByName('environment') + ".api.oemsecrets.com/v2" : "";
+		var token;
+		var currency;
+		var orderQuantity = "1";
+		var region = "";
+		var tableId = ".oemsec-price-table";
+		var currencySymbol = "";
+		var trackerURL = "https://analytics.oemsecrets.com/main.php";
+		var displayDetails;
+		var showRelatedHeader;
+		var showProductDropdown;
+		var currencySelected = false;
+		var decimalPlaces;
+		var headers;
+		var filters;
+		var showPCB;
+		var userFilters;
+		var company;
+		var showHeader;
+		var partSeries;
+		var manufacturer;
+		var showLogo;
+		var showPCB;
+		var priceBreakLimit;
+		var dropdown = 0;
+		var currencyData;
+		var originalSearch;
+		var singleDatasheet;
+		var singleDescription;
+		var getCurrency;
+		var selectedCountry ="";
+
+		function run(){
+			getAttr();
+			if(token.length > 0){
+				addScripts();
+				buildContainer();
+				callAjax();	
+			}
+		}
+		
+		function getAttr(){		
+			secretsURL = document.querySelector('script[data-oemsec_src]') !== null ? parentScript.getAttribute('data-oemsec_src') : loaderDomain;
+			token = mainScript.getAttribute('data-oemsec_key');
+			oemsecSearchTerm = mainScript.getAttribute('data-oemsec_search') ? mainScript.getAttribute('data-oemsec_search').replace(/[^a-zA-Z 0-9]+/g, '') : getParameterByName('search_token');
+			originalSearch = mainScript.getAttribute('data-oemsec_search') ? mainScript.getAttribute('data-oemsec_search').replace(/[^a-zA-Z 0-9]+/g, '') : getParameterByName('search_token');
+			partSeries = mainScript.getAttribute('data-oemsec_series') ? mainScript.getAttribute('data-oemsec_series').replace(/[^a-zA-Z 0-9]+/g, '') : getParameterByName('series_token');
+			orderQuantity = mainScript.getAttribute('data-oemsec_quantity') ? mainScript.getAttribute('data-oemsec_quantity') : getParameterByName('quantity_req');
+			getCurrency = mainScript.getAttribute('data-oemsec_currency') ? mainScript.getAttribute('data-oemsec_currency') : getParameterByName('currency_sel');				
+		}
+		
+		function addScripts(){
+			jQuery('head').append('<link id="oemsec-css" rel="stylesheet" href="' + secretsURL + '/css/oemsec-styles.css" type="text/css" />');
+			jQuery('head').append('<link id="oemsec-bootstrap" rel="stylesheet" href="' + secretsURL + '/css/oemsec-bootstrap.css" type="text/css" />');
+			jQuery('head').append('<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" type="text/css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous" />');
+		}
+		
+
+		function buildContainer(){
+			jQuery(mainScript.parentNode).append(
+				"<div class='container-fluid oemsec-wrapper' id='oemsec-wrapper' style='min-height: 150px'>"+	
+					"<div class='oemsec-loader-section' style='min-height: 150px; text-align: center'>"+
+						"<div class='oemsec-loader' style='padding: 50px'></div>"+
+					"</div>"+	
+					"<div class='oemsec-price-table' id='oemsec-table-container'>"+
+					"</div>"+
+					"<div class='oemsec-custom-script'></div>"+
+				"</div>" 
+			);
+		}
+		
+		function callAjax(){
+			jQuery('.oemsec-table-container').html("");
+			jQuery('.oemsec-price-table').hide();
+			jQuery('.oemsec-loader-section').css("display", "block");
+			
+			if(getCurrency.length > 0 && typeof currency == 'undefined'){
+				currency = getCurrency;
+			}		
+			
+			var passCurrency = 	currency;	
+			if(passCurrency == 'Select Currency'){
+				passCurrency = "USD";
+	    	}
+			if(selectedCountry ==""){
+				selectedCountry = "UNKNOWN"
+			}
+
+			jQuery.ajax({
+		        type: 'post',
+		        url: secretsURL + '/search.php',
+		        dataType: 'json',
+		        data: { 
+		        		format : "js",
+		                search : oemsecSearchTerm,
+		                series: partSeries,
+		                token : token,
+		                quantity : orderQuantity,
+		                currency: passCurrency,
+		                region: region,
+		                manufacturer: manufacturer,
+						countryCode: selectedCountry
+
+
+		            },
+		            success: function (data) {
+		            	parseData(data);
+		            	jQuery('.oemsec-loader-section').css("display", "none");
+		            }
+		     });
+		}
+		
+		function parseData(data){
+			assignArrays(data);
+			addUserStyles();
+			pageHeader(data);
+			specificDatasheet();
+			specificDescription();
+			pricingTableHeaders();
+
+			if(data['stock'].length > 0 || countObject(data['stock']) > 0){
+				pricingTable(data);			
+			}
+			relatedSearch(data);
+			productDropdown(data);
+			jQuery('.oemsec-all-filters').on('change', function(){
+				jQuery(".oemsec-filter-form").submit();
+			});
+	        jQuery('.show-pricing').on('click', function(){
+	            jQuery(this).parent().parent().siblings('.hidePrice').toggleClass('d-none');         
+	            jQuery(this).find('i').toggleClass('fa-chevron-up' , 'fa-chevron-down');
+	        });
+	        jQuery('.oemsec-related-search').on('click', function(){        	
+	        	oemsecSearchTerm = jQuery(this).data('part');
+	        	partSeries = jQuery(this).data('related');
+	        	jQuery(".oemsec-price-table").hide();
+	        	callAjax();
+	        });
+		}
+		
+		function assignArrays(data){
+			assignOptionValues(data['options']);
+			currencyData = data['currencies'];
+			filters = data['allFilters'];
+			displayDetails = data['displayDetails'];
+			headers = data['allHeaders'];
+			dropdown = data['displayDetails']['Api_Dropdown'];
+			singleDatasheet = data['datasheet'];
+			singleDescription = data['description'];
+			oemsecStockData = data['stock'];
+		}
+		
+		function assignOptionValues(data){
+			currency = data['currency'];
+			manufacturer = data['manufacturer'];
+			part = data['part'];
+			orderQuantity = data['quantity'];
+			region = data['region'];
+			userFilters = data['filters'];
+			company = data['company'];
+			showHeader = data['header'];
+			showLogo = data['showLogo'];
+			showPCB = data['showPCB'];
+			priceBreakLimit = data['priceBreakLimit'];
+			showRelatedHeader = data['showRelatedHeader'];
+			decimalPlaces = data['decimalPlaces'];
+			showProductDropdown = data['showProductDropdown'];
+		}
+		
+		function addUserStyles(data){
+			jQuery('head').append('<link rel="stylesheet" href="' + secretsURL + '/headers/'+ company + '/style.css" type="text/css" />');
+		}	
+		
+		function pageHeader(data){
+			jQuery(tableId).html(
+				pricingTableFilters(data)
+			);	
+
+			jQuery('.oemsec-custom-script').html(addUserHeader(data))
+			
+			jQuery('.oemsec-filter-form').on('submit', function(e){
+				e.preventDefault();
+				oemsecSearchTerm = jQuery('.oemsec-part-field').val()  ? jQuery('.oemsec-part-field').val() : oemsecSearchTerm;
+				originalSearch = jQuery('.oemsec-part-field').val();
+				orderQuantity = jQuery('.oemsec-quantity-field').val() ? jQuery('.oemsec-quantity-field').val() : orderQuantity;
+				currency= jQuery('.oemsec-currency-field').val() ? jQuery('.oemsec-currency-field').val() : currency;
+				partSeries = jQuery('.oemsec-part-field').val()  ? jQuery('.oemsec-part-field').val() : oemsecSearchTerm;
+				if(jQuery('.oemsec-currency-field').val() != null){
+					currencySelected = true;
+				}
+				
+				region= jQuery('.oemsec-region-field').val() ? jQuery('.oemsec-region-field').val() : region;
+				manufacturer= jQuery('.oemsec-manufacturer-field').val() ? jQuery('.oemsec-manufacturer-field').val() : manufacturer;
+				callAjax();
+			});
+		}
+		
+		function specificDatasheet(){
+			if(singleDatasheet !== null){
+				jQuery(tableId).append(
+						"<div class='oemsec-datasheet-block'>"+
+							singleDatasheet +
+						"</div>"
+				);
+			}
+		}
+		
+		function specificDescription(){
+			if(singleDescription !== null){
+				jQuery(tableId).append(
+						"<div class='oemsec-description-block'>"+
+							singleDescription +
+						"</div>"
+				);
+			}
+		}
+		
+		
+		function addUserHeader(data){
+			if(showHeader > 0){
+				if(data['header'] !=false){
+					return data['header'];
+				}else{
+					return "";
+				}
+			}else{
+				return "<span/>";
+			}
+		}
+		
+	//added autocomplete off
+
+		function pricingTableFilters(data){
+			if(userFilters > 0){		
+				var display =
+			
+				"<div class='row oemsec-search-filter-container'>"+
+					"<div class='col-12 oemsec-search-filter-col'>"+
+						"<form method='POST' class='oemsec-filter-form' autocomplete='off'>"+
+							"<div class='row oemsec-search-container'>"+
+									searchBox(data) +
+									quantityBox(data) +
+								"<div class='col oemsec-search-btn-container'>"+
+									"<button type='submit' class='oemsec-btn-search'>Search</button>"+
+								"</div>"+
+							"</div>"+
+
+							
+							"<div class='row oemsec-filters-container'>"+
+									currencyFilter(data) +							
+									regionFilter(data) +
+									manufacturerFilter(data) +
+								"</div>"+
+						"</form>"+
+					"</div>"+
+				"</div>";
+				return display;
+			}else{
+				return "";
+			}
+		}
+		
+		function searchBox(data){
+			var searchBox = "";
+			if(filters['part'] == 1){
+				searchBox = "<div class='col oemsec-part-container'>";
+				searchBox = searchBox.concat("<input type='text' name='part' class='oemsec-part-field form-control' value='" + data['options']['part'] +"'>");
+				searchBox = searchBox.concat("</div>");
+			}
+			return searchBox;
+		}
+		
+		function quantityBox(data){
+			var quantityBox = "";
+			var quantity = "";
+			if(filters['quantity'] == 1){
+				quantityBox = "<div class='col oemsec-quantity-container'>";
+				if(data['options']['quantity'] > 1){
+					quantity = data['options']['quantity'];
+				}
+				quantityBox = quantityBox.concat("<input type='text' name='quantity' class='oemsec-quantity-field form-control' value='" + quantity +"' placeholder='Enter a Quantity'>");
+				quantityBox = quantityBox.concat("</div>");
+			}
+			return quantityBox;
+		}
+		
+		
+		function currencyFilter(data){
+			var selectForm = "";
+			if(data['currencies'] != null){
+				if(filters['currency'] == 1){
+					selectForm = "<div class='col oemsec-currency-container'>";
+					selectForm = selectForm.concat("<select name='currency' class='oemsec-currency-field oemsec-all-filters custom-select'>");
+					if(!currencySelected){
+						selectForm = selectForm.concat("<option selected='selected' disabled>Select Currency</option>");
+					}else{
+						selectForm = selectForm.concat("<option selected='selected' disabled>" + currency  +"</option>");
+					}
+					jQuery.each(data['currencies'] , function(index, element){
+						selectForm = selectForm.concat(
+							"<option value='"+ index + "'>"+
+								index +
+							"</option>"
+						);
+					});
+					selectForm = selectForm.concat("</select>");
+					selectForm = selectForm.concat("</div>");
+				}
+			}
+			return selectForm
+		}
+		
+		function regionFilter(data){
+			var regionForm = "";
+			if(data['regions'] != null){
+				if(filters['region'] == 1){
+					regionForm = "<div class='col oemsec-region-container'>";
+					regionForm = regionForm.concat("<select name='region' class='oemsec-region-field oemsec-all-filters custom-select'>");
+					regionForm = regionForm.concat("<option selected='selected' disabled>"+ data['options']['region'] +"</option>");
+					jQuery.each(data['regions'] , function(index, element){
+						regionForm = regionForm.concat(
+							"<option value='"+ index + "'>"+
+								index +
+							"</option>"
+						);
+					});
+					regionForm = regionForm.concat("<option value='Select Region'>All Regions</option>");
+					regionForm = regionForm.concat("</select>");
+					regionForm = regionForm.concat("</div>");
+				}
+			}
+			return regionForm
+		}
+		
+		function manufacturerFilter(data){
+			var manufacturerForm = "";
+			if(data['manufacturers'] != null){
+				if(filters['manufacturer'] == 1){
+					manufacturerForm = "<div class='col oemsec-manufacturer-container'>";
+					manufacturerForm = manufacturerForm.concat("<select name='region' class='oemsec-manufacturer-field oemsec-all-filters custom-select'>");
+					manufacturerForm = manufacturerForm.concat("<option selected='selected' disabled>"+ data['options']['manufacturer'] +"</option>");
+					jQuery.each(data['manufacturers'] , function(index, element){
+						manufacturerForm = manufacturerForm.concat(
+							"<option value='"+ index + "'>"+
+								index +
+							"</option>"
+						);
+					});
+					manufacturerForm = manufacturerForm.concat("<option value='Select Manufacturer'>All Manufacturers</option>");
+					manufacturerForm = manufacturerForm.concat("</select>");
+					manufacturerForm = manufacturerForm.concat("</div>");
+				}
+			}
+			return manufacturerForm
+		}
+		
+		function pricingTableHeaders(){
+			jQuery(tableId).append(
+					"<div class='row oemsec-part-title-row'>"+
+						"<div class='col-12 oemsec-part-title-col'>"+
+							"<span class='oemsec-part-title'>" + oemsecSearchTerm + "</span>"+
+						"</div>"+
+					"</div>"+
+
+						"<div class='row oemsec-header'>" +
+							"<div class='col oemsec-font-control oemsec-Distributor'>"+
+								"<span class='oemsec-table-cell'>Distributor</span>"+
+							"</div>"
+			);
+			jQuery.each(headers, function(key,row){
+				var headerClass = row['headerName'].replace(/\s/g,'');
+				if(row['active'] == 1){
+					jQuery('.oemsec-header').append(	
+						"<div class='col oemsec-font-control oemsec-"+ headerClass+ "'>"+
+							"<span class='oemsec-table-cell'>"+ row['headerName'] + "</span>"+
+						"</div>"
+					);
+				}
+			});
+			
+			if(showPCB > 0){
+				jQuery('.oemsec-header').append(
+					"<div class='col oemsec-font-control oemsec-pcb'>"+
+						"<span class='oemsec-table-cell'>PCB</span>"+
+					"</div>"
+						
+				);
+			}
+			jQuery('.oemsec-header').append(					
+						"<div class='col oemsec-font-control oemsec-Buynow'>"+
+							"<span class='oemsec-table-cell'>Buy Now</span>"+
+						"</div>"+
+					"</div>"+
+				"</div>"
+			);
+		}
+
+
+		function pricingTable(data){
+			var stock = data['stock'];	
+			jQuery.each(stock, function(index, row) {
+				var element = row[Object.keys(row)[0]]
+				var currencyField;
+				var logo;
+				var pcbURL = "https://www.oemsecrets.com/pcb/" + element['manufacturer'] + "/" + element['origpartno'];
+				if(showLogo > 0){
+					logo = "<img src='"+ element['logo'] + "' class='oemsec-logos' alt='"+ element['companyname'] + "'>";
+				}else{
+					logo = "<span>"+element['companyname'] +"</span>";
+				}
+				if(countObject(element) > 0){			
+					var key = "collapse-" + element['supprecno'];
+					var rowId = "oemsec-row-"+key;
+					if(document.querySelector('#' + rowId) !== null) {
+						return;
+					}
+					jQuery(tableId).append(
+							"<div class='row oemsec-results-row' id='" + rowId + "'>"+			           	
+								"<div class='col m-auto oemsec-font-control oemsec-Distributor-cell' data-country_export='"+element['export']+"'>"+
+					        		logo +
+					        	"</div>"
+					        			
+					);			
+					
+					jQuery.each(headers, function(key,row){
+						var columnElement = element[row['headerColumn']] ? element[row['headerColumn']] : "-";
+						var headerClass = row['headerName'].replace(/\s/g,'');
+						if(typeof columnElement == 'undefined' || typeof columnElement == 'object'){					
+							columnElement = "-";
+						}
+						if(row['active'] == 1){
+							if(row['headerName'] == 'Price'){
+								currencySymbol = data['currencies'][data['options']['currency']] + " ";
+								currencyField = rowId + "-price";
+								jQuery('#' + rowId).append(
+									"<div class='col m-auto oemsec-font-control position-relative oemsec-"+ headerClass+ "-cell'  id='" + currencyField +"'>"+
+				        				"<span class='oemsec-table-cell'>"+
+				        					priceBreaks(element, currency, true)+
+				        				"</span>"+
+									"</div>"
+				        		);
+							}else if(row['headerName'] == 'Datasheet'){
+								var datasheet = columnElement != '-' ? "<a href='"+ element['datasheeturl'] +"' target='_BLANK'><img src='https://media.oemsecrets.com/images/icons/datasheet.png'></a>" : ""; 
+								jQuery('#' + rowId).append(							
+										"<div class='col m-auto oemsec-font-control oemsec-"+ headerClass+ "-cell'>"+
+											"<span class='oemsec-table-cell'>"+
+												datasheet +
+					        				"</span>"+
+										"</div>"
+									);
+							}else if(row['headerName'] == 'Lead Time'){
+								var leadtime = element['leadtime'] ? element['leadtime'] + " " + element['leadtimeFormat']  : "-";
+								jQuery('#' + rowId).append(							
+										"<div class='col m-auto oemsec-font-control oemsec-"+ headerClass+ "-cell'>"+
+											"<span class='oemsec-table-cell'>"+
+												leadtime +
+					        				"</span>"+
+										"</div>"
+									);
+							}else{
+								jQuery('#' + rowId).append(	
+									"<div class='col m-auto oemsec-font-control oemsec-"+ headerClass+ "-cell'>"+
+				        				"<span class='oemsec-table-cell'>"+
+				        					columnElement +
+				        				"</span>"+
+									"</div>"
+								);
+							}
+						}
+					});	
+					
+					if(showPCB > 0){
+						  jQuery('#' + rowId).append (
+					    		"<div class='col m-auto oemsec-font-control oemsec-pcb-cell'>"+
+				    				"<a href='"+ pcbURL + "' title='PCB Loader'><img src='https://media.oemsecrets.com/images/icons/pcb.png' class='pcb'></a>"+  
+				    			"</div>"
+						  );
+					}
+					
+				    jQuery('#' + rowId).append (				    		
+								"<div class='col m-auto oemsec-font-control  oemsec-Buynow-cell'>"+
+									"<a href='"+ element['buynowurl'] +"'  target='_BLANK' class='oemsec-buy-btn'>"+
+										"<div class='oemsec-buy'>"+
+											displayDetails['Api_BuyNow']+
+										"</div>"+
+									"</a>"+
+								"</div>"+						
+						"</div>"
+					);
+					closeRow();			
+					jQuery("#" + currencyField).on('mouseover', function(){
+						jQuery(this).find("div").addClass('show-price');
+					}).on('mouseout', function(){
+						jQuery(this).find("div").removeClass('show-price');	
+					});
+				}
+			});
+		}
+		
+	    function priceBreaks(element, currency, viewMore){
+	    	var limit = priceBreakLimit;
+	        var priceTable = "<table class='pricing-table m-auto'>";
+	        var priceArray = element['pricingarray'][currency];
+	        if(priceArray !=null){
+	            var priceBreak = element['currentpricebreak'];
+	            var position = element['currentpriceposition'];
+	            var size = element['pricearraysize'];
+	            var counter = 1;
+	            var hideClass;
+	            var highlight;
+	            jQuery.each(priceArray, function(key, value){
+	                hideClass = "";
+	                highlight = "";
+	                switch(position){
+	                    case 1:
+	                        if(counter > limit){
+	                            hideClass = 'd-none hidePrice';
+	                        }
+	                        break;
+	                    case size:
+	                        if(counter < size - (limit - 1)){
+	                            hideClass = 'd-none hidePrice';
+	                        }
+	                        break;
+	                    default:
+	                    	if(limit < 2){
+	                    		if(counter < position || counter > position){
+		                            hideClass = 'd-none hidePrice';
+		                        }
+	                    	}else{	
+		                        if(counter < position -1 || counter > position + 1){
+		                            hideClass = 'd-none hidePrice';
+		                        }
+	                    	}
+	                        break;              
+	                }
+	                var price = Number(value).toLocaleString('en-US', {maximumFractionDigits:  decimalPlaces, minimumFractionDigits: decimalPlaces});
+	                if(position == counter){
+	                     highlight = "highlight-price";                     
+	                }
+	                priceTable = priceTable.concat("<tr class='price-row "+ hideClass + " "+ highlight +"'><td class='oemsec-break-col'>" + key  + "</td><td class='oemsec-price-col'>" + currencyData[currency] + price + "<td></tr>");
+	                counter ++;
+	            });
+	            if(size > limit && viewMore){
+	                priceTable = priceTable.concat("<tr class='oemsec-view-pricing'><td colspan='2'><a href='javascript:void(0);' class='show-pricing price-row'>View pricing <i class='fa fa-chevron-down'></i></a></td></tr>");
+	            }
+	        }else{
+	            priceTable =" - " ;
+	        }
+	        
+
+	        
+	        var priceTable = priceTable.concat("</table>");
+	        return priceTable;
+	    }   
+		
+		function closeRow(){
+			jQuery(tableId).append(			 
+					"</div>"+
+				"</div>"
+			);		
+		}
+		
+		function relatedSearch(data){
+			if(data['relatedParts'] != null){
+				var stock = data['relatedParts'];
+				var series = stock['series'];
+				var parts = stock['parts'];
+				jQuery(tableId).append(
+					"<div class='row oemsec-related-header-row'>"+
+						"<div class='col oemsec-related-part oemsec-header-cell'>"+
+							"Part" +
+						"</div>"+
+						"<div class='col oemsec-related-description oemsec-header-cell'>"+
+							"Description"+
+						"</div>"+
+						"<div class='col oemsec-related-compare oemsec-header-cell'>"+
+							"Compare"+
+						"</div>"+
+					"</div>"
+				);
+				jQuery.each(parts, function(category,product){
+					jQuery(tableId).append(
+							"<div class='oemsec-related-results' id='"+ category +"'>"
+						);				
+					if(showRelatedHeader > 0){
+						jQuery('#'+ category).append(
+									"<div class='row oemsec-related-row'><div class='col-12'>"+
+										"<h4>Product Type: " + product[0]['category'] + "</h4>"+
+									"</div></div>"
+							);
+					}
+					jQuery.each(product, function(key,value){
+						jQuery('#'+ category).append(	
+							"<div class='row oemsec-related-row'>"+					
+								"<div class='col oemsec-related-part-cell'><span class='oemsec-table-cell'>"+
+									value['part'] +
+								"</span></div>"+
+								"<div class='col oemsec-related-description-cell'><span class='oemsec-table-cell'>"+
+									value['description'] +
+								"</span></div>"+
+								"<div class='col oemsec-related-compare-cell'>"+
+									"<a href='javascript:void(0);' class='oemsec-related-search' data-part='"+ value['part'] +"' data-related='" + partSeries + "'><i class='fa fa-search' aria-hidden='true'></i>"+
+									"<span class='oemsec-compare-btn'>Compare</span></a>"+
+								"</div>"+
+							"</div>"
+						);
+					});
+					jQuery(tableId).append(
+							"</div>"
+						);	
+				});
+			}
+		}
+		
+		function productDropdown(data){
+			if(showProductDropdown > 0){
+				if(data['relatedParts'] != null){
+					var parts = data['relatedParts']['parts'];
+					jQuery(tableId).append(
+							"<select class='partselector'>"+
+								"<option selected disabled>" +
+									oemsecSearchTerm +
+								"</option>" +
+							"</select>"
+					);
+					
+					jQuery.each(parts, function(category,row){
+						var partsForDropdown = [];
+						jQuery.each(row, function(id, part){
+							partsForDropdown.push( part['part'] );
+						});
+						partsForDropdown.sort();
+						jQuery.each(partsForDropdown, function(key, part){
+							jQuery('.partselector').append(
+								"<option value='" + part + "'>" +
+									part +
+								"</option>"
+							);
+						});
+					});
+				}
+				jQuery('.partselector').on('change', function(){
+					oemsecSearchTerm = jQuery(this).val();
+					jQuery(".oemsec-price-table").hide();
+					callAjax();
+				});
+			}
+		}
+
+		function countObject(data){
+			var count = 0;
+			for (i in data) {
+			    if (data.hasOwnProperty(i)) {
+			        count++;
+			    }
+			}
+			return count;
+		}
+		
+		function getParameterByName(name) {
+			name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+			var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			results = regex.exec(location.search);
+			return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+		}
+		
+
+		jQuery(document).ready(function() {
+			
+			jQuery('.countries ul li ul li').on('click', function(){
+				selectedCountry = jQuery(this).attr("data-code");
+				jQuery(".oemsec-price-table").hide();
+				callAjax();
+			});
+	
+		});
+
+
+		run();	
+	});
+
+
+

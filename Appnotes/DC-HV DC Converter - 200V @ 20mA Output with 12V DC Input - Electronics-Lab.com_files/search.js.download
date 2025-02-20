@@ -1,0 +1,38 @@
+var loaderURL = "api.oemsecrets.com/v2";
+var loaderDomain;
+var loaderScript = document.createElement("script");
+var mainScript = document.querySelector('script[data-oemsec_key]');
+
+function run(){
+	getParams();
+	appendScript();
+}
+
+
+function getParams(){
+	loaderDomain = getParameterByName('environment') ? getParameterByName('environment') + "."+ loaderURL : loaderURL;
+}
+
+function insertAfterScript(referenceNode, newNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+function appendScript(){
+
+	loaderScript.type = 'text/javascript';
+	loaderScript.src = "https://"+ loaderDomain+ "/loader.js"
+	loaderScript.setAttribute("data-oemsec_src", "https://"+ loaderDomain)
+	insertAfterScript(mainScript, loaderScript)
+}
+
+function getParameterByName(name) {
+	name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+	var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+	results = regex.exec(location.search);
+	return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+run();
+
+
+

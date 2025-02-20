@@ -1,0 +1,9 @@
+.oemsec-loader-section {
+	display: none !important;
+}
+
+.distributor_results {
+	float: left;
+	width: 100%;
+	position: relative;
+}

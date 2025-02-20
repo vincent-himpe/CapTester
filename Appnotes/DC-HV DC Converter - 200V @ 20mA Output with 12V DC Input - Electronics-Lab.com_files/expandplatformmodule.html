@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)https://www.pcbway.com/Invite/expandplatformmodule -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title></title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .electronics-lab-module {
+            width: 100%;
+            padding: 14px 0;
+            border: 3px solid #00a63f;
+            position: relative;
+            background: #f2f4f6;
+        }
+
+        .electronics-lab-module .electronics-lab-title {
+            text-align: center;
+            position: relative;
+            z-index: 8;
+        }
+
+
+        .electronics-lab-module .pcbway-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 3;
+            display: block;
+            background: url("images/expand-platform/the-party-logo.png") no-repeat center;
+            width: 144px;
+            height: 40px;
+            text-indent: -99999999999px;
+        }
+
+        @media screen and (max-width: 750px) {
+            .electronics-lab-module .pcbway-logo {
+                width: 90px;
+                height: 40px;
+                background-size: contain;
+            }
+        }
+
+        .electronics-lab-module .the-drag-upload {
+            border: 2px dashed #00A63F;
+            width: 96%;
+            height: 106px;
+            background-color: #ffffff;
+            border-radius: 4px;
+            margin: 10px auto 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .electronics-lab-module .the-drag-upload .set-files-btn {
+            min-width: 150px;
+            padding: 0 14px;
+            color: #fff;
+            height: 30px;
+            margin: 0 auto;
+            background-color: #00a63f;
+            border-radius: 3px;
+            font-size: 14px;
+            font-weight: 700;
+            position: relative;
+            text-decoration: none;
+            display: inline-block;
+            line-height: 27px;
+            cursor: pointer;
+        }
+
+        .electronics-lab-module .the-drag-upload .set-files-btn:hover {
+            background: #009739;
+        }
+
+        .electronics-lab-module .the-drag-upload .set-files-btn:before {
+            display: inline-block;
+            content: '';
+            background: url("images/expand-platform/upload-icon.png") no-repeat center;
+            width: 16px;
+            height: 16px;
+            vertical-align: sub;
+            margin-right: 4px;
+        }
+
+        .electronics-lab-module .the-drag-upload .format-tips {
+            color: #333333;
+            font-size: 13px;
+            text-align: center;
+            padding: 8px 0;
+            opacity: 0.8;
+        }
+
+        .electronics-lab-module .the-drag-upload .information-file {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            height: 15px;
+        }
+
+        .electronics-lab-module .the-drag-upload .information-file .file-name {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 700;
+            vertical-align: top;
+            line-height: 12px;
+            margin-right: 6px;
+        }
+
+        .electronics-lab-module .the-drag-upload .information-file .file-bar {
+            background: none repeat scroll 0 0 #E8E8E8;
+            height: 12px;
+            margin-right: 0;
+            width: 200px;
+            vertical-align: top;
+            display: inline-block;
+            border-radius: 10px;
+        }
+
+        .electronics-lab-module .the-drag-upload .information-file .file-bar .c-k {
+            display: inline-block;
+            background: none repeat scroll 0 0 #27ae61;
+            float: left;
+            height: 100%;
+            position: relative;
+            width: 0;
+            text-align: left;
+            color: #fff;
+            border-radius: 10px;
+        }
+
+        .electronics-lab-module .the-drag-upload .information-file .file-bar .c-k .count {
+            color: #fff;
+            margin-left: 4px;
+            position: absolute;
+            top: -2px;
+            font-size: 12px;
+            left: 0;
+            height: 100%;
+            z-index: 3;
+        }
+
+        .electronics-lab-module .set-params-box {
+            width: 96%;
+            margin: 0 auto;
+        }
+
+        .electronics-lab-module .set-params-box .params-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item {
+            display: flex;
+            line-height: 30px;
+            align-content: center;
+            flex: 1;
+            min-width: 0;
+            margin-left: 30px;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item:first-child {
+            margin-left: 0px;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item label {
+            display: inline-block;
+            width: 94px;
+            text-align: left;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item .dim-params {
+            display: flex;
+            flex: 1;
+            width: calc(100% - 94px);
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item input[type=text] {
+            height: 36px;
+            text-indent: 5px;
+            border: 1px solid #999;
+            background-color: #FFF;
+            outline: 0;
+            line-height: 36px;
+            padding-left: 6px;
+            display: flex;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item input[type=text]:hover {
+            border-color: #67A1E1;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item .input-x-addon {
+            background: #f2f5f8;
+            width: 32px;
+            height: 36px;
+            text-align: center;
+            border-top: 1px solid #999;
+            border-bottom: 1px solid #999;
+            line-height: 30px;
+            font-size: 13px;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item .input-x-addon.unit {
+            border-right: 1px solid #999;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item select {
+            height: 36px;
+            color: #333;
+            width: calc(100% - 94px);
+            min-width: 0;
+            border: 1px solid #999;
+            background-color: #FFF;
+            outline: 0;
+            padding-left: 6px;
+            cursor: pointer;
+        }
+
+        .electronics-lab-module .set-params-box .params-row .each-item select:hover {
+            border-color: #67A1E1;
+        }
+
+        .electronics-lab-module .quote-tool-row {
+            margin-top: 22px;
+            text-align: center;
+        }
+
+        .electronics-lab-module .quote-tool-row .quote-btn {
+            width: 220px;
+            height: 36px;
+            background-color: #f89800;
+            outline: none;
+            border: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .electronics-lab-module .quote-tool-row .quote-btn:hover {
+            background: #e68d00;
+        }
+
+        .electronics-lab-module .quote-tool-row .free-tips {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .electronics-lab-module .quote-tool-row .free-tips .price {
+            color: #00A63F;
+            font-weight: 700;
+        }
+    </style>
+
+    <script src="./jquery-1.11.3.min.js.download"></script>
+    <script type="text/javascript" src="./plupload.full.min.js.download"></script>
+    <script src="./layer.js.download" type="text/javascript"></script><link rel="stylesheet" href="./layer.css" id="layui_layer_skinlayercss" style="">
+    <script src="./stringcheck.js.download" type="text/javascript"></script>
+    <script src="./frametools.js.download" type="text/javascript"></script>
+
+</head>
+<body>
+    <div class="electronics-lab-module">
+        <form id="frmInstantQuote" action="https://www.pcbway.com/orderonline.aspx" method="get" target="_blank">
+            <a class="pcbway-logo" href="https://www.pcbway.com/" target="_blank">pcbway</a>
+            <div class="electronics-lab-title">
+                <img class="the-party-title" src="./the-party-title.png" alt="" width="495" height="45">
+            </div>
+            <div class="the-drag-upload" id="container" style="position: relative;">
+                <div class="set-files-btn" id="pickfiles" style="z-index: 1;"> Add Gerber File</div>
+                <div class="format-tips">
+                    Automatically sets the board size,hole,track/spacing. only accept.rar or .zip &amp;
+                    Maximum 20M
+                </div>
+                <div class="information-file" style="display:none;">
+                    <span class="file-name">share_blue.zip</span>
+                    <span class="file-bar">
+                        <span class="c-k" style="width: 80%">
+                            <span class="count">80%</span>
+                        </span>
+                    </span>
+                </div>
+            <div id="html5_1hqdi7fed1t5i3orn3rhr2t774_container" class="moxie-shim moxie-shim-html5" style="position: absolute; top: 20px; left: 452px; width: 150px; height: 30px; overflow: hidden; z-index: 0;"><input id="html5_1hqdi7fed1t5i3orn3rhr2t774" type="file" style="font-size: 999px; opacity: 0; position: absolute; top: 0px; left: 0px; width: 100%; height: 100%;" accept=".zip,.rar,.7z"></div></div>
+            <div class="set-params-box">
+                <div class="params-row">
+                    <div class="each-item">
+                        <label>Dimensions:</label>
+                        <div class="dim-params">
+                            <input type="text" placeholder="Length" id="circuit-y" name="x" class="js-check-size">
+                            <div class="input-x-addon">x</div>
+                            <input type="text" placeholder="Width" id="circuit-x" name="y" class="js-check-size">
+                            <div class="input-x-addon unit">mm</div>
+                        </div>
+                    </div>
+                    <div class="each-item">
+                        <label>Quantity:</label>
+                        <select id="num" name="num">
+                            <option value="">Choose Num (pcs)</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                            <option value="25">25</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            <option value="75">75</option>
+                            <option value="100">100</option>
+                            <option value="-1">100+</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="params-row">
+                    <div class="each-item">
+                        <label>Layers:</label>
+                        <select id="Layersquote" name="Layersquote">
+                            <option value="1">1 Layer</option>
+                            <option value="2" selected="selected">2 Layers</option>
+                            <option value="4">4 Layers</option>
+                            <option value="6">6 Layers</option>
+                            <option value="8">8 Layers</option>
+                            <option value="10">10 Layers</option>
+                            <option value="12">12 Layers</option>
+                            <option value="14">14 Layers</option>
+                        </select>
+                    </div>
+                    <div class="each-item">
+                        <label>Thickness:</label>
+                        <select name="Thicknessquote" id="Thicknessquote">
+                            <option value="">Thickness</option>
+                            <option value="0.4">0.4mm</option>
+                            <option value="0.6">0.6mm</option>
+                            <option value="0.8">0.8mm</option>
+                            <option value="1.0">1.0mm</option>
+                            <option value="1.2">1.2mm</option>
+                            <option value="1.6" selected="selected">1.6mm</option>
+                            <option value="2.0">2.0mm</option>
+                            <option value="2.4">2.4mm</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="quote-tool-row">
+                <input type="hidden" name="fileurl" id="gerberFileUrl">
+                <input type="hidden" name="filename" id="gerberFileNm">
+                <input type="hidden" name="from" value="electronicslab">
+                <button type="submit" class="quote-btn">Quote Now</button>
+                <div class="free-tips">
+                    Get <span class="price">$5.00</span>-Free Prototype Order
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+
+<script type="text/javascript">
+
+
+    var layerindex = null;
+
+    $(function () {
+
+        var uploader = new plupload.Uploader({
+            runtimes: 'html5,flash,silverlight,html4',
+            browse_button: 'pickfiles', // you can pass an id...
+            container: document.getElementById('container'), // ... or DOM Element itself
+            url: 'https://www.pcbway.com/common/upfile/',
+            flash_swf_url: '/img/js/jqueryplus/plupload/plupload-2.3.1/Moxie.swf',
+            silverlight_xap_url: '/img/js/jqueryplus/plupload/plupload-2.3.1/Moxie.xap',
+            multi_selection: false,
+            multipart_params: {
+                'uptype': 'gerberfile'
+            },
+
+            filters: {
+                max_file_size: '20mb',
+                mime_types: [
+                    { title: "Zip files", extensions: "zip,rar,7z" }
+                ],
+                prevent_duplicates: true //不允许选取重复文件
+            },
+
+            init: {
+                PostInit: function () {
+                    //document.getElementById('filelist').innerHTML = '';
+
+                    //$("#upload_success").hide();
+                    //$("#upload_success_faild").hide();
+
+
+                },
+
+                FilesAdded: function (up, files) {
+                    // 需要把前一次加入的文件删除
+                    if (uploader.files.length > 1) {
+                        uploader.files.splice(0, 1);
+                    }
+                    plupload.each(files, function (file) {
+
+                        $('.file-name').text(file.name);
+                        $('.file-bar .c-k').css({ 'width': '0%' });
+                        $('.file-bar .count').text('0%');
+
+                        $('.information-file').show();
+
+
+                    });
+                    uploader.start();
+                },
+                FileUploaded: function (up, file, info) {
+
+                    if (info.status == 200) {
+                        var res = eval('(' + info.response + ')');
+
+                        if (res.state == "SUCCESS") {
+                            $("#gerberFileUrl").val(res.url);
+                            $("#gerberFileNm").val(res.original);
+
+                            $('.file-bar .c-k').css({ 'width': '100%' });
+                            $('.file-bar .count').text('100%');
+
+                            $('.file-bar').hide();
+
+                            layerindex = layer.load(2, { shade: 0.2 });
+
+                            $.post("https://www.pcbway.com/order/GetParmByFile", { filepath: res.url, filename: res.original }, function (data) {
+                                callbakloadfile(data, file);
+                            })
+
+                        }
+                        else {
+                            alert(res.state);
+                        }
+                    }
+                    else {
+                        $('.file-name').text(info.response);
+                    }
+                },
+                UploadProgress: function (up, file) {
+                    file.percent = file.percent - 1;
+                    if (file.percent < 0)
+                        file.percent = 1;
+
+
+                    $('.file-bar .c-k').css({ 'width': file.percent + '%' });
+                    $('.file-bar .count').text(file.percent + '%');
+
+
+                },
+
+                Error: function (up, err) {
+                    if (err.code == -600) { // 文件太大
+                        alert(err.message);
+                    } else {
+                        alert(err.message);
+                    }
+                }
+            }
+        });
+
+        uploader.init();
+
+
+        function callbakloadfile(data, file) {
+            if (data.result == true && data.msg.boundary_width > 0) {
+
+                $('#circuit-y').val(data.msg.boundary_width);
+                $('#circuit-x').val(data.msg.boundary_height);
+                $('#Layersquote').val(data.msg.num_copper);
+               
+            }
+
+            setTimeout(function () {
+                layer.close(layerindex);
+            }, 300)
+        }
+
+    });
+
+
+</script>
+<script type="text/javascript" src="./VisitorJS.aspx"></script>
+</body></html>

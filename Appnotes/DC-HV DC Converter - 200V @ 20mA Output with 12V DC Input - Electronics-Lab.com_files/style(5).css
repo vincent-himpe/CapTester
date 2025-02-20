@@ -1,0 +1,103 @@
+#oemsec-wrapper .border-top-0-offer {
+	border-top: 0px solid transparent !important;
+}
+
+#oemsec-wrap .border {
+    border-color: #ebebeb !important;
+}
+
+body #oemsec-wrapper {
+	font-size: 12px;
+	font-family: "Open Sans", "Roboto";
+} 
+
+body #oemsec-wrapper span 
+{
+	color: #404040;
+}
+
+#oemsec-wrapper .fa.fa-chevron-down,
+#oemsec-wrapper .fa.fa-chevron-up {
+	font-size: 9px !important;
+}
+
+#oemsec-wrapper .highlight-price {
+	font-weight: 700 !important;
+}
+#oemsec-wrapper .border-brand {
+	border-color: #d6d6d6 !important;
+}
+
+#oemsec-wrapper .btn-brand {
+	font-size: 12px!important;
+    background-color: #f7f7f7;
+    padding: 9px 15px;
+    border-radius: 20px;
+    line-height: 12px!important;
+}
+
+#oemsec-wrapper .btn-brand-highlight {
+	background-color: #3290df;
+    color: #fff !important;
+    text-shadow: none;
+    transition: all .4s ease 0s;
+    -moz-transition: all .4s ease 0s;
+    -webkit-transition: all .4s ease 0s;
+    -o-transition: all .4s ease 0s;
+
+}
+
+
+.border-bottom-section {
+	border-bottom: 1px solid #ebebeb !important;
+}
+
+#oemsec-wrapper .btn-brand:hover {
+	background-color: #3290df;
+    color: #fff !important;
+    text-shadow: none;
+    transition: all .4s ease 0s;
+    -moz-transition: all .4s ease 0s;
+    -webkit-transition: all .4s ease 0s;
+    -o-transition: all .4s ease 0s;
+
+}
+
+#oemsec-wrapper .distributor-logo {
+	width: 100px;
+}
+
+#oemsec-wrapper .oemsec-section-header {
+    color: #575757;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-family: 'Open Sans', sans-serif;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+body #oemsec-wrapper table,
+body #oemsec-wrapper tr,
+body #oemsec-wrapper td,
+body #oemsec-wrapper td a {
+	font-size: 12px;
+	font-family: "Open Sans", "Roboto";
+}
+
+body #oemsec-wrapper a {
+    font-size: 12px;
+    font-family: "Roboto" !important;
+}
+
+.di-footer {
+    text-align: right;
+    line-height: 20px;
+    color: #6c757d !important;
+    font-size: 14px;
+}
+
+.di-footer img {
+	width: 150px;
+	vertical-align: bottom !important;
+}

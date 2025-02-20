@@ -1,0 +1,26 @@
+.oemsec-loader{
+   background-color:transparent;
+   z-index:100;
+}
+
+.oemsec-loader:before{
+  content: " ";
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 5px solid #454545;
+  border-color: #454545 transparent #454545 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+  position:absolute;
+}
+
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+

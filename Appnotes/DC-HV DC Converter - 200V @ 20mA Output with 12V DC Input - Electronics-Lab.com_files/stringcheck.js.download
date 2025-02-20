@@ -1,0 +1,379 @@
+﻿String.prototype.IsPartNumber = function(){
+	myReg = /^[0-9a-zA-Z#][0-9a-zA-Z-_\+\/\.\\ \(\)#\=%]{3,49}$/;
+	if (myReg.test(this)){
+	    return true;
+	}else{
+		return false;
+	}
+}
+
+String.prototype.IsPdfPartNumber = function () {
+    myReg = /^[0-9a-zA-Z#][0-9a-zA-Z-_\+\/\.\\ \(\)#\=%]{2,49}$/;
+    if (myReg.test(this)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+ 
+
+String.prototype.len = function () {
+    return this.replace(/[^\x00-\xff]/g, "**").length;
+}
+
+String.prototype.IsDate = function () {
+    var myReg = /^(\d{4})(-|\/|.)(\d{1,2})\2(\d{1,2})$/;
+    var result = this.match(myReg);
+    if (result == null) return false;
+    var test = new Date(result[1], result[3] - 1, result[4]);
+    if ((test.getFullYear() == result[1]) && (test.getMonth() + 1 == result[3]) && (test.getDate() == result[4])) {
+        //ActRs.Clear();
+        //ActRs[0]=result[1];ActRs[1]=result[3];ActRs[2]=result[4];
+        return true;
+    }
+    else return false;
+}
+
+String.prototype.IsTime = function () {
+    var myReg = /^(\d{1,2})(:)(\d{1,2})\2(\d{1,2})$/;
+    var result = this.match(myReg);
+    if (result == null) return false;
+    var test = new Date(2000, 1, 1, result[1], result[3], result[4]);
+    if ((test.getHours() == result[1]) && (test.getMinutes() == result[3]) && (test.getSeconds() == result[4])) {
+        //ActRs[3]=result[1];ActRs[4]=result[3];ActRs[5]=result[4];
+        return true;
+    }
+    else return false;
+}
+
+String.prototype.IsDateTime = function () {
+    var myReg = this.split(" ");
+    if (myReg.length != 2) return false;
+    if (myReg[0].IsDate() && myReg[1].IsTime()) return true;
+    return false;
+}
+
+String.prototype.IsEmail = function () {
+    myReg = /^[_a-zA-Z0-9\-]+(\.[_a-zA-Z0-9\-]*)*@[a-zA-Z0-9\-]+([\.][a-zA-Z0-9\-]+)+$/;
+    if (myReg.test(this)) {
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
+String.prototype.IsUserName = function () {
+    myReg = /^[0-9a-zA-Z_]{3,16}$/;
+    if (myReg.test(this)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+String.prototype.IsPassword = function () {
+    myReg = /^.{6,16}$/;
+    if (myReg.test(this)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+String.prototype.IsIdcard = function () {
+    var myReg = /^[1-9][0-9]{14}$|^[1-9][0-9]{16}[0-9a-zA-Z]$/;
+    if (myReg.test(this)) return true;
+    return false;
+}
+
+String.prototype.IsNumber = function () {
+    var myReg = /^[0-9]+$/;
+    if (!myReg.test(this)) return false;
+    ActRd = parseInt(this)
+    return true;
+}
+
+String.prototype.IsFloat = function () {
+    var myReg = /^[0-9.]+$/;
+    if (!myReg.test(this)) return false;
+    var pos = this.indexOf('.')
+    if (pos == -1) return false;
+    if (pos != this.lastIndexOf('.')) return false;
+    if (pos == 0 || (pos + 1) == this.length) return false;
+    ActRd = parseFloat(this)
+    return true;
+}
+
+
+String.prototype.IsPhone = function () {
+    if (!this.IsNumber()) return false;
+    if (this.length != 11 || this < 13000000000 || this > 13999999999) return false;
+    return true;
+}
+
+
+String.prototype.IsEn = function () {
+    var myReg = /^[a-zA-Z]+$/;
+    if (myReg.test(this)) return true;
+    return false;
+}
+
+String.prototype.IsCn = function () {
+    var ch, temp, isCN, isTrue;
+    isTrue = true;
+    for (var i = 0; i < this.length; i++) {
+        ch = this.substring(i, i + 1);
+        temp = escape(ch);
+        isCN = (temp.length == 6) ? true : false;
+        if (!isCN) {
+            isTrue = false;
+            break;
+        }
+    }
+    return isTrue;
+}
+
+
+String.prototype.Trim = function () {
+    return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+
+String.prototype.Left = function (n) {
+    return strLeft(this, n);
+}
+
+String.prototype.Right = function (n) {
+    return strRight(this, n);
+}
+
+String.prototype.Len = function () {
+    var len = 0;
+    for (var i = 0; i < this.length; i++) {
+        if (this.charCodeAt(i) > 255) len += 2;
+        else len++;
+    }
+    return len;
+}
+
+
+
+String.prototype.Escape = function () {
+    return escape(this);
+}
+
+String.prototype.UnEscape = function () {
+    return unescape(this);
+}
+
+String.prototype.UrlEncode = function () {
+    var i, c, p, q, ret = "", strSpecial = "!\"#$%&'()*+,/:;<=>?@[\]^`{|}~%";
+    for (i = 0; i < this.length; i++) {
+        if (this.charCodeAt(i) >= 0x4e00) {
+            var p = GBStr.indexOf(this.charAt(i));
+            if (p >= 0) {
+                q = p % 94;
+                p = (p - q) / 94;
+                ret += ("%" + (0xB0 + p).toString(16) + "%" + (0xA1 + q).toString(16)).toUpperCase();
+            }
+        }
+        else {
+            c = this.charAt(i);
+            if (c == " ")
+                ret += "+";
+            else if (strSpecial.indexOf(c) != -1)
+                ret += "%" + this.charCodeAt(i).toString(16);
+            else
+                ret += c;
+        }
+    }
+    return ret;
+}
+
+
+String.prototype.replaceToIntStr = function (maxlen) {
+
+    var val = this;
+    if (!val) {
+        return '';
+    }
+
+    val = val.replace(/[^\d]/ig, '');
+    
+    if (maxlen > 0 && val.length > maxlen) {
+        val = val.substr(0, maxlen);
+    }
+
+    return val;
+}
+
+String.prototype.replaceToFloatStr = function () {
+
+    var val = this;
+    if (!val) {
+        return '';
+    }
+
+    val = val.replace(/[^\d.]/ig, '').replace(/^\.+/, '');
+
+   
+
+    if (val.indexOf('.') != val.lastIndexOf('.')) {
+        var ms = val.match(/(\d+).\d+/);
+        if (ms != null && ms.length > 0) {
+            return ms[0];
+        } else {
+            return '';
+        }
+    }
+
+    return val;
+}
+
+
+String.prototype.toInt = function () {
+
+    return parseInt(this);
+}
+
+String.prototype.toFloat = function () {
+
+    return parseFloat(this);
+}
+
+String.prototype.toHex = function () {
+    if (!this.IsNumber()) return "";
+    var x = parseInt(this);
+    var out = "";
+    var remainder;
+    while (x > 0) {
+        remainder = x % 16;
+        if (remainder < 10) {
+            out = remainder + out;
+        } else if (remainder == 10) {
+            out = "a" + out;
+        } else if (remainder == 11) {
+            out = "b" + out;
+        } else if (remainder == 12) {
+            out = "c" + out;
+        } else if (remainder == 13) {
+            out = "d" + out;
+        } else if (remainder == 14) {
+            out = "e" + out;
+        } else if (remainder == 15) {
+            out = "f" + out;
+        }
+        x = Math.floor(x / 16);
+    }
+    return out;
+}
+
+String.prototype.toDate = function () {
+    ActRs.Clear();
+    this.IsDate();
+    return new Date(ActRs[0], ActRs[1] - 1, ActRs[2]);
+}
+
+String.prototype.toSpell = function (sp) {
+    var i, t, p, ret = "";
+    if (sp == null) sp = "";
+    for (i = 0; i < this.length; i++) {
+        if (this.charCodeAt(i) >= 0x4e00) {
+            p = GBStr.indexOf(this.charAt(i));
+            if (p > -1 && p < 3755) {
+                for (t = GBSpell.length - 1; t > 0; t = t - 2)
+                    if (GBSpell[t] <= p) break;
+                if (t > 0)
+                    ret += GBSpell[t - 1] + sp;
+            }
+        }
+        else ret += this.charAt(i) + sp;
+    }
+    return ret.substr(0, ret.length - sp.length);
+}
+
+String.prototype.toSpell = function (sp) {
+    var i, t, p, ret = "";
+    if (sp == null) sp = "";
+    for (i = 0; i < this.length; i++) {
+        if (this.charCodeAt(i) >= 0x4e00) {
+            p = GBStr.indexOf(this.charAt(i));
+            if (p > -1 && p < 3755) {
+                for (t = GBSpell.length - 1; t > 0; t = t - 2)
+                    if (GBSpell[t] <= p) break;
+                if (t > 0)
+                    ret += GBSpell[t - 1] + sp;
+            }
+        }
+        else ret += this.charAt(i) + sp;
+    }
+    return ret.substr(0, ret.length - sp.length);
+}
+
+
+
+String.prototype.Count = function () {
+    var out = new Array(256);
+    for (var i = 0; i < this.length; i++) {
+        if (out[this.charCodeAt(i)] == undefined) {
+            out[this.charCodeAt(i)] = 1;
+        } else {
+            out[this.charCodeAt(i)]++;
+        }
+    }
+    return out;
+}
+
+//ToRoundMoney2
+String.prototype.ToRoundMoney2 = function () {
+    if (!this || this == undefined || this == null) { return 0; }
+
+    return Math.round(parseFloat(this) * 100) / 100;
+
+}
+String.prototype.ToRoundMoneyStr2 = function () {
+    if (!this || this == undefined || this == null) { return '0.00'; }
+
+    return (Math.round(parseFloat(this) * 100) / 100).toFixed(2);
+}
+
+Number.prototype.ToRoundMoney2 = function () {
+    if (!this || this == undefined || this == null) { return 0; }
+
+    return Math.round(this * 100) / 100;
+}
+Number.prototype.ToRoundMoneyStr2 = function () {
+    if (!this || this == undefined || this == null) { return '0.00'; }
+
+    return (Math.round(this * 100) / 100).toFixed(2);
+}
+
+//ToRoundMoney2
+
+//ToRoundMoney4
+String.prototype.ToRoundMoney4 = function () {
+    if (!this || this == undefined || this == null) { return 0; }
+
+    return Math.round(parseFloat(this) * 10000) / 10000;
+
+}
+String.prototype.ToRoundMoneyStr4 = function () {
+    if (!this || this == undefined || this == null) { return '0.0000'; }
+
+    return (Math.round(parseFloat(this) * 10000) / 10000).toFixed(4);
+}
+
+Number.prototype.ToRoundMoney4 = function () {
+    if (!this || this == undefined || this == null) { return 0; }
+
+    return Math.round(this * 10000) / 10000;
+}
+Number.prototype.ToRoundMoneyStr4 = function () {
+    if (!this || this == undefined || this == null) { return '0.0000'; }
+
+    return (Math.round(this * 10000) / 10000).toFixed(4);
+}
+
+//ToRoundMoney4
